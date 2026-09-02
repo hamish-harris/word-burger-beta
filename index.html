@@ -154,14 +154,6 @@ body.locked #app{height:100%}
 .streaks .s .l{font-size:9.5px; color:var(--steel); text-transform:uppercase; letter-spacing:.09em; margin-top:1px}
 
 .home-more{margin-top:auto; padding-top:var(--s6)}
-.btn.slow-cook{
-  display:flex; align-items:center; justify-content:center; gap:13px;
-  height:auto; padding:15px 22px;
-}
-.slow-cook .sc-icon{width:34px; height:34px; flex:none; filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
-.slow-cook .sc-text{display:flex; flex-direction:column; align-items:flex-start; line-height:1.2}
-.slow-cook .sc-text b{font-size:19px; font-weight:700; letter-spacing:.01em}
-.slow-cook .sc-text small{font-size:10.5px; text-transform:uppercase; letter-spacing:.1em; opacity:.7; font-weight:600; margin-top:2px}
 .rule{display:flex; align-items:center; gap:var(--s3); color:var(--steel); font-size:11px; text-transform:uppercase; letter-spacing:.14em; font-family:var(--display); margin-bottom:var(--s3)}
 .rule::before,.rule::after{content:''; flex:1; height:1px; background:var(--line)}
 .duo{display:flex; gap:var(--s2)}
@@ -1198,16 +1190,7 @@ body::before{
     <div class="home-more">
       <div class="rule">More to chew on</div>
       <div class="stack">
-        <button class="btn ghost slow-cook" onclick="window.location.href='/target/?play=1'">
-          <svg class="sc-icon" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="22" cy="22" r="20" fill="#F6ECD6"/>
-            <circle cx="22" cy="22" r="20" fill="none" stroke="#2A1A06" stroke-width="1.5" opacity=".15"/>
-            <circle cx="22" cy="22" r="14" fill="#C63D26"/>
-            <circle cx="22" cy="22" r="8" fill="#F6ECD6"/>
-            <circle cx="22" cy="22" r="3.5" fill="#2A1A06"/>
-          </svg>
-          <span class="sc-text"><b>Slow Cook</b><small id="scSub">Daily Target</small></span>
-        </button>
+        <button class="btn ghost sm" onclick="window.location.href='/target/?play=1'">Slow Cook</button>
         <div class="duo">
           <button class="btn ghost sm" onclick="Free.open()">Free play</button>
           <button class="btn ghost sm" onclick="PP.open()">Pass and play</button>
@@ -2001,12 +1984,6 @@ function renderHome(){
   const s=Store.get();
   const done = s.today && s.today.day===Daily.day;
   const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
-  const scSub=$('scSub');
-  if(scSub){
-    const scDate = new Date(LAUNCH + Daily.day*86400000)
-      .toLocaleDateString(undefined,{timeZone:'UTC', weekday:'short', day:'numeric', month:'short'});
-    scSub.textContent = 'Burger #'+(Daily.day+1)+' · '+scDate;
-  }
   const streaks = (s.streak||s.played) ? `
     <div class="streaks">
       <div class="s"><div class="n">🔥 ${s.streak||0}</div><div class="l">streak</div></div>
@@ -2597,6 +2574,7 @@ $('freeDiff').addEventListener('click', e=>{
    ============================================================ */
 (async function boot(){
   // the splash must always come down, whatever else happens
+  const skipOnboarding = new URLSearchParams(location.search).get('skip')==='1';
   const s0=Store.get();
   const seen=!!s0.seenSplash;
   const splashEl=$('splash');
@@ -2613,7 +2591,7 @@ $('freeDiff').addEventListener('click', e=>{
   }
   splashEl.addEventListener('click', dismissSplash);
 
-  const hold = seen ? 1300 : 2800;
+  const hold = skipOnboarding ? 0 : (seen ? 1300 : 2800);
   const holdTimer=setTimeout(dismissSplash, hold);
 
   try{
@@ -2703,8 +2681,11 @@ $('freeDiff').addEventListener('click', e=>{
   }
   addFab('s-home');
 
-  /* first visit: pop it open shortly after the splash lifts */
-  if(!seenHelp()){
+  /* first visit: pop it open shortly after the splash lifts, unless
+     we're returning cleanly from a sub-page like Slow Cook */
+  const skipOnboarding = new URLSearchParams(location.search).get('skip')==='1';
+  if(skipOnboarding){ markHelp(); }
+  else if(!seenHelp()){
     setTimeout(()=>{ if(!seenHelp()) openHelp(); }, 1900);
   }
 
