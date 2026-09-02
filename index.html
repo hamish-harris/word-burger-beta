@@ -703,8 +703,8 @@ body::before{
 /* Home and result screens are flex columns whose children shrink under
    pressure, and the daily card clips what it can't fit. Let the screens
    scroll instead. */
-#s-home > *, #s-daily-res > *{flex-shrink:0}
-#s-home, #s-daily-res{overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch}
+#s-home > *, #s-daily-res > *, #s-slow-home > *, #s-slow-res > *{flex-shrink:0}
+#s-home, #s-daily-res, #s-slow-home, #s-slow-res{overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch}
 /* The card's overflow:hidden only ever cropped content because flex
    squashed the card shorter than its contents. With flex-shrink:0 above,
    the card grows to fit, so hidden is safe again and goes back to doing
@@ -1284,7 +1284,7 @@ body::before{
     <p class="sub">No clock. Stack every word that fits between the buns until you reach today's target.</p>
 
     <div class="spacer"></div>
-    <div id="slowDailyCard"></div>
+    <div class="daily" id="slowDailyCard"></div>
     <div class="past-wrap" id="slowPastWrap"></div>
   </section>
 
@@ -1335,6 +1335,9 @@ body::before{
 
   <!-- SLOW COOK: RESULT -->
   <section class="screen" id="s-slow-res">
+    <div class="head">
+      <button class="back" onclick="go('s-home')">‹ Home</button>
+    </div>
     <div class="res-head">
       <div class="eyebrow" id="srKicker">Word Burger #1</div>
       <h2 id="srTitle">Nice stack</h2>
