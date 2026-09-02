@@ -154,6 +154,9 @@ body.locked #app{height:100%}
 .streaks .s .l{font-size:9.5px; color:var(--steel); text-transform:uppercase; letter-spacing:.09em; margin-top:1px}
 
 .home-more{margin-top:auto; padding-top:var(--s6)}
+.sc-home-btn{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; padding-top:9px; padding-bottom:9px}
+.sc-home-btn b{font-size:16px; font-weight:700}
+.sc-home-btn small{font-size:10px; text-transform:uppercase; letter-spacing:.08em; opacity:.65; font-weight:600}
 .rule{display:flex; align-items:center; gap:var(--s3); color:var(--steel); font-size:11px; text-transform:uppercase; letter-spacing:.14em; font-family:var(--display); margin-bottom:var(--s3)}
 .finish-chip{
   margin-left:6px; padding:5px 11px; border-radius:20px; cursor:pointer;
@@ -1197,7 +1200,9 @@ body::before{
     <div class="home-more">
       <div class="rule">More to chew on</div>
       <div class="stack">
-        <button class="btn ghost sm" onclick="renderSlowHome(); go('s-slow-home')">Slow Cook</button>
+        <button class="btn ghost sm sc-home-btn" onclick="renderSlowHome(); go('s-slow-home')">
+          <b>Slow Cook</b><small id="scHomeSub">Daily Target</small>
+        </button>
         <div class="duo">
           <button class="btn ghost sm" onclick="Free.open()">Free play</button>
           <button class="btn ghost sm" onclick="PP.open()">Pass and play</button>
@@ -2153,6 +2158,12 @@ function renderHome(){
   const s=Store.get();
   const done = s.today && s.today.day===Daily.day;
   const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
+  const scHomeSub=$('scHomeSub');
+  if(scHomeSub){
+    SlowCook.refresh();
+    const scDate = new Date().toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
+    scHomeSub.textContent = 'Burger #'+(SlowCook.day+1)+' · '+scDate;
+  }
   const streaks = (s.streak||s.played) ? `
     <div class="streaks">
       <div class="s"><div class="n">🔥 ${s.streak||0}</div><div class="l">streak</div></div>
@@ -2529,13 +2540,13 @@ function renderSlowHome(){
   const s=Store.get();
   const done = s.slowToday && s.slowToday.day===SlowCook.day;
   const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
-  const streaks = (s.slowStreak||s.slowPlayed) ? `
+  const streaks = `
     <div class="streaks">
       <div class="s"><div class="n">🔥 ${s.slowStreak||0}</div><div class="l">streak</div></div>
       <div class="s"><div class="n">${s.slowBestStreak||0}</div><div class="l">best run</div></div>
       <div class="s"><div class="n">${s.slowBestScore||0}</div><div class="l">best score</div></div>
       <div class="s"><div class="n">💎 ${s.slowDiamonds||0}</div><div class="l">rare words</div></div>
-    </div>` : '';
+    </div>`;
 
   $('slowDailyCard').innerHTML = done ? `
     <div class="meta">Daily Burger #${SlowCook.day+1} · ${dateLbl} · you scored ${s.slowToday.score}</div>
@@ -2545,9 +2556,7 @@ function renderSlowHome(){
     <button class="btn" onclick="SlowCook.play()">Order up</button>
     ${streaks}`;
 
-  $('slowPastWrap').innerHTML = SlowHistory.has()
-    ? `<button class="btn ghost sm" onclick="SlowHistory.open()">Past burgers</button>`
-    : '';
+  $('slowPastWrap').innerHTML = `<button class="btn ghost sm" onclick="SlowHistory.open()">Past burgers</button>`;
 }
 
 /* ============================================================
