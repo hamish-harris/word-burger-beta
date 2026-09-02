@@ -1189,22 +1189,14 @@ body::before{
 
   <!-- HOME -->
   <section class="screen" id="s-home">
-    <div class="home-top">
-      <svg class="logo-svg" viewBox="0 0 360 262" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Word Burger">
-        <rect x="14" y="6" width="332" height="52" rx="26" fill="#D89A4E"/>
-        <ellipse cx="122" cy="30" rx="12" ry="6" fill="#F6ECD6"/>
-        <ellipse cx="180" cy="24" rx="12" ry="6" fill="#F6ECD6"/>
-        <ellipse cx="238" cy="30" rx="12" ry="6" fill="#F6ECD6"/>
-        <rect x="8" y="66" width="344" height="70" rx="16" fill="#F2A81D"/>
-        <text x="180" y="104" text-anchor="middle" dominant-baseline="central" font-family="Fredoka,'Trebuchet MS',sans-serif" font-weight="700" font-size="50" fill="#17120E">WORD</text>
-        <rect x="8" y="144" width="344" height="70" rx="16" fill="#C63D26"/>
-        <text x="180" y="182" text-anchor="middle" dominant-baseline="central" font-family="Fredoka,'Trebuchet MS',sans-serif" font-weight="700" font-size="46" fill="#F6ECD6">BURGER</text>
-        <rect x="14" y="222" width="332" height="40" rx="20" fill="#B8803C"/>
-      </svg>
-      <p class="home-tag">Two letters. No clock. Stack words until you hit the target.</p>
+    <div class="head">
+      <button class="back" onclick="window.location.href='/'">‹ Back</button>
+      <h2>Slow Cook</h2>
     </div>
+    <p class="sub">No clock. Stack every word that fits between the buns until you reach today's target.</p>
 
-    <div class="daily" id="dailyCard"></div>
+    <div class="spacer"></div>
+    <div id="dailyCard"></div>
     <div class="past-wrap" id="pastWrap"></div>
   </section>
 
@@ -2003,29 +1995,14 @@ function renderHome(){
   Daily.refresh();
   const s=Store.get();
   const done = s.today && s.today.day===Daily.day;
-  const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
-  const streaks = (s.streak||s.played) ? `
-    <div class="streaks">
-      <div class="s"><div class="n">🔥 ${s.streak||0}</div><div class="l">streak</div></div>
-      <div class="s"><div class="n">${s.bestStreak||0}</div><div class="l">best run</div></div>
-      <div class="s"><div class="n">${s.bestScore||0}</div><div class="l">best score</div></div>
-      <div class="s"><div class="n">💎 ${s.diamonds||0}</div><div class="l">rare words</div></div>
-    </div>` : '';
+  const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
 
   $('dailyCard').innerHTML = done ? `
-    <div class="eyebrow">${dateLbl}</div>
-    <div class="mode-badge">🎯 Slow Cook</div>
-    <h2>Today's burger is stacked</h2>
-    <div class="meta">Burger #${Daily.day+1} · you scored ${s.today.score}</div>
+    <div class="meta">Daily Burger #${Daily.day+1} · ${dateLbl} · you scored ${s.today.score}</div>
     <div class="rank-badge" id="homeRank" style="display:none"><span class="live-dot"></span>Ranked <b>#<span id="homeRankNum">-</span></b> today</div>
-    <button class="btn" onclick="Daily.showResult()">See result and share</button>
-    ${streaks}` : `
-    <div class="eyebrow">${dateLbl}</div>
-    <div class="mode-badge">🎯 Slow Cook</div>
-    <h2>Daily Burger #${Daily.day+1}</h2>
-    <div class="meta">Same two buns for everyone today.<br>No clock. Reach the target to stack it.</div>
-    <button class="btn" onclick="Daily.play()">Play today's burger</button>
-    ${streaks}`;
+    <button class="btn" onclick="Daily.showResult()">See result and share</button>` : `
+    <div class="meta">Daily Burger #${Daily.day+1} · ${dateLbl}</div>
+    <button class="btn" onclick="Daily.play()">Order up</button>`;
 
   if(done){
     const cachedRank = (s.rankByDay||{})[s.today.day];
