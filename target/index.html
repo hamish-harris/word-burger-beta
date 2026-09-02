@@ -1996,13 +1996,22 @@ function renderHome(){
   const s=Store.get();
   const done = s.today && s.today.day===Daily.day;
   const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
+  const streaks = (s.streak||s.played) ? `
+    <div class="streaks">
+      <div class="s"><div class="n">🔥 ${s.streak||0}</div><div class="l">streak</div></div>
+      <div class="s"><div class="n">${s.bestStreak||0}</div><div class="l">best run</div></div>
+      <div class="s"><div class="n">${s.bestScore||0}</div><div class="l">best score</div></div>
+      <div class="s"><div class="n">💎 ${s.diamonds||0}</div><div class="l">rare words</div></div>
+    </div>` : '';
 
   $('dailyCard').innerHTML = done ? `
     <div class="meta">Daily Burger #${Daily.day+1} · ${dateLbl} · you scored ${s.today.score}</div>
     <div class="rank-badge" id="homeRank" style="display:none"><span class="live-dot"></span>Ranked <b>#<span id="homeRankNum">-</span></b> today</div>
-    <button class="btn" onclick="Daily.showResult()">See result and share</button>` : `
+    <button class="btn" onclick="Daily.showResult()">See result and share</button>
+    ${streaks}` : `
     <div class="meta">Daily Burger #${Daily.day+1} · ${dateLbl}</div>
-    <button class="btn" onclick="Daily.play()">Order up</button>`;
+    <button class="btn" onclick="Daily.play()">Order up</button>
+    ${streaks}`;
 
   if(done){
     const cachedRank = (s.rankByDay||{})[s.today.day];
