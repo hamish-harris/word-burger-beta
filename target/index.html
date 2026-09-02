@@ -2609,6 +2609,10 @@ $('ppDiff').addEventListener('click', e=>{
    BOOT
    ============================================================ */
 (async function boot(){
+  // arriving straight from the main site's Slow Cook button - skip the
+  // branding splash and first-time instructions, go straight to the game
+  const skipOnboarding = new URLSearchParams(location.search).get('play')==='1';
+
   // the splash must always come down, whatever else happens
   const s0=Store.get();
   const seen=!!s0.seenSplash;
@@ -2626,7 +2630,7 @@ $('ppDiff').addEventListener('click', e=>{
   }
   splashEl.addEventListener('click', dismissSplash);
 
-  const hold = seen ? 1300 : 2800;
+  const hold = skipOnboarding ? 0 : (seen ? 1300 : 2800);
   const holdTimer=setTimeout(dismissSplash, hold);
 
   try{
@@ -2716,8 +2720,11 @@ $('ppDiff').addEventListener('click', e=>{
   }
   addFab('s-home');
 
-  /* first visit: pop it open shortly after the splash lifts */
-  if(!seenHelp()){
+  /* first visit: pop it open shortly after the splash lifts, unless we
+     arrived straight from the main site's Slow Cook button */
+  const skipOnboarding = new URLSearchParams(location.search).get('play')==='1';
+  if(skipOnboarding){ markHelp(); }
+  else if(!seenHelp()){
     setTimeout(()=>{ if(!seenHelp()) openHelp(); }, 1900);
   }
 
