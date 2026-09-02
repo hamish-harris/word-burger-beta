@@ -1394,6 +1394,22 @@ body::before{
     <div class="hx-list" id="hxList"></div>
   </section>
 
+  <!-- SLOW COOK: PAST BURGERS -->
+  <section class="screen" id="s-slow-history">
+    <div class="head">
+      <button class="back" onclick="go('s-slow-home')">‹ Back</button>
+      <h2>Past burgers</h2>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="n" id="shxPlayed">0</div><div class="l">played</div></div>
+      <div class="tile"><div class="n" id="shxBest">0</div><div class="l">best score</div></div>
+      <div class="tile"><div class="n" id="shxAvg">0</div><div class="l">average</div></div>
+      <div class="tile"><div class="n" id="shxDia">💎 0</div><div class="l">rare words</div></div>
+    </div>
+    <div class="rule">Tap a burger to see your words</div>
+    <div class="hx-list" id="shxList"></div>
+  </section>
+
   <!-- FREE PLAY RESULT -->
   <section class="screen" id="s-free-res">
     <div class="res-head">
@@ -1626,12 +1642,13 @@ const Store = (function(){
    HELPERS
    ============================================================ */
 const $ = id => document.getElementById(id);
-const SCROLL_LOCK_SCREENS = new Set(['s-play','s-pp-play','s-pp-win','s-pp-pass']);
+const SCROLL_LOCK_SCREENS = new Set(['s-play','s-pp-play','s-pp-win','s-pp-pass','s-slow-play']);
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   $(id).classList.add('on');
   document.body.classList.toggle('locked', SCROLL_LOCK_SCREENS.has(id));
   if(id==='s-home' && typeof renderHome==='function') renderHome();
+  if(id==='s-slow-home' && typeof renderSlowHome==='function') renderSlowHome();
 }
 function scoreOf(len, tier){ return Math.round((len-2)*(len-1)/2*MULT[tier]); }
 function tierOfLen(len){ return len>=9?3 : len>=7?2 : len>=5?1 : 0; }
@@ -2077,6 +2094,57 @@ const History = (function(){
   };
 })();
 
+const SlowHistory = (function(){
+  function dateOf(day){
+    return new Date(LAUNCH + day*86400000)
+      .toLocaleDateString(undefined,{timeZone:'UTC', weekday:'short', day:'numeric', month:'short'});
+  }
+  function rows(){
+    const seen=new Set(), out=[];
+    (Store.get().slowHistory||[]).slice().reverse().forEach(h=>{
+      if(!h || seen.has(h.day)) return;
+      seen.add(h.day); out.push(h);
+    });
+    return out;
+  }
+  function chips(words){
+    return '<div class="words">'+words.slice().sort((a,b)=>b.pts-a.pts).map(o=>
+      '<span class="c">'+esc(o.w)+'<b>+'+o.pts+(o.tier===3?' 💎':o.tier===2?' ◆':'')+'</b></span>'
+    ).join('')+'</div>';
+  }
+  return {
+    has(){ return rows().length>0; },
+    open(){
+      const s=Store.get(), list=rows();
+      const scores=list.map(h=>h.score||0);
+      const dia=list.reduce((n,h)=>n+(h.words||[]).filter(o=>o.tier===3).length, 0);
+      $('shxPlayed').textContent = list.length;
+      $('shxBest').textContent   = Math.max(s.slowBestScore||0, scores.length?Math.max.apply(null,scores):0);
+      $('shxAvg').textContent    = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+      $('shxDia').textContent    = '💎 '+Math.max(s.slowDiamonds||0, dia);
+
+      $('shxList').innerHTML = list.length ? list.map((h,i)=>{
+        const d=(h.words||[]).filter(o=>o.tier===3).length;
+        const body = h.words && h.words.length
+          ? chips(h.words)
+          : '<div class="hx-none">Words weren\'t saved for this one.</div>';
+        return '<div class="hx-item" id="shx'+i+'">'
+          +  '<button class="hx-row" onclick="SlowHistory.toggle('+i+')">'
+          +    '<span class="hx-buns">'+esc(h.start)+'<i>–</i>'+esc(h.end)+'</span>'
+          +    '<span class="hx-mid"><b>Burger #'+(h.day+1)+'</b><small>'+dateOf(h.day)+'</small></span>'
+          +    '<span class="hx-sc">'+(h.score||0)+'<small>'+(h.found||0)+'/'+(h.target||0)+(d?' · 💎'+d:'')+'</small></span>'
+          +  '</button>'
+          +  '<div class="hx-body">'+body+'</div>'
+          +'</div>';
+      }).join('') : '<div class="hx-empty">No burgers yet. Play today\'s and it will show up here.</div>';
+
+      track('slow_history_open', { entries:list.length });
+      go('s-slow-history');
+    },
+    toggle(i){ const el=$('shx'+i); if(el) el.classList.toggle('open'); }
+  };
+})();
+
 /* ============================================================
    HOME
    ============================================================ */
@@ -2476,6 +2544,10 @@ function renderSlowHome(){
     <div class="meta">Daily Burger #${SlowCook.day+1} · ${dateLbl}</div>
     <button class="btn" onclick="SlowCook.play()">Order up</button>
     ${streaks}`;
+
+  $('slowPastWrap').innerHTML = SlowHistory.has()
+    ? `<button class="btn ghost sm" onclick="SlowHistory.open()">Past burgers</button>`
+    : '';
 }
 
 /* ============================================================
