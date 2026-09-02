@@ -1198,7 +1198,7 @@ body::before{
     <div class="home-more">
       <div class="rule">More to chew on</div>
       <div class="stack">
-        <button class="btn ghost slow-cook" onclick="window.location.href='https://test.word-burger.com/target/'">
+        <button class="btn ghost slow-cook" onclick="window.location.href='/target/'">
           <svg class="sc-icon" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
             <circle cx="22" cy="22" r="20" fill="#F6ECD6"/>
             <circle cx="22" cy="22" r="20" fill="none" stroke="#2A1A06" stroke-width="1.5" opacity=".15"/>
@@ -1206,7 +1206,7 @@ body::before{
             <circle cx="22" cy="22" r="8" fill="#F6ECD6"/>
             <circle cx="22" cy="22" r="3.5" fill="#2A1A06"/>
           </svg>
-          <span class="sc-text"><b>Slow Cook</b><small>Daily Target</small></span>
+          <span class="sc-text"><b>Slow Cook</b><small id="scSub">Daily Target</small></span>
         </button>
         <div class="duo">
           <button class="btn ghost sm" onclick="Free.open()">Free play</button>
@@ -2001,6 +2001,12 @@ function renderHome(){
   const s=Store.get();
   const done = s.today && s.today.day===Daily.day;
   const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
+  const scSub=$('scSub');
+  if(scSub){
+    const scDate = new Date(LAUNCH + Daily.day*86400000)
+      .toLocaleDateString(undefined,{timeZone:'UTC', weekday:'short', day:'numeric', month:'short'});
+    scSub.textContent = 'Burger #'+(Daily.day+1)+' · '+scDate;
+  }
   const streaks = (s.streak||s.played) ? `
     <div class="streaks">
       <div class="s"><div class="n">🔥 ${s.streak||0}</div><div class="l">streak</div></div>
