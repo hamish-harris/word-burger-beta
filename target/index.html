@@ -589,6 +589,12 @@ body::before{
    TYPE + PRIMITIVES
    ============================================================ */
 .eyebrow{font-family:var(--display); text-transform:uppercase; letter-spacing:.18em; font-size:11.5px; color:var(--mustard)}
+.mode-badge{
+  display:inline-flex; align-items:center; gap:6px; margin:6px 0 10px;
+  font-family:var(--display); font-weight:700; font-size:13px;
+  color:#2A1A06; background:linear-gradient(180deg, var(--mustard-hi), var(--mustard));
+  padding:5px 12px; border-radius:20px; letter-spacing:.02em;
+}
 
 .label{font-family:var(--display); text-transform:uppercase; letter-spacing:.12em; font-size:11.5px; color:var(--steel); margin-bottom:var(--s3)}
 
@@ -2018,12 +2024,14 @@ function renderHome(){
 
   $('dailyCard').innerHTML = done ? `
     <div class="eyebrow">${dateLbl}</div>
+    <div class="mode-badge">🎯 Slow Cook</div>
     <h2>Today's burger is stacked</h2>
     <div class="meta">Burger #${Daily.day+1} · you scored ${s.today.score}</div>
     <div class="rank-badge" id="homeRank" style="display:none"><span class="live-dot"></span>Ranked <b>#<span id="homeRankNum">-</span></b> today</div>
     <button class="btn" onclick="Daily.showResult()">See result and share</button>
     ${streaks}` : `
     <div class="eyebrow">${dateLbl}</div>
+    <div class="mode-badge">🎯 Slow Cook</div>
     <h2>Daily Burger #${Daily.day+1}</h2>
     <div class="meta">Same two buns for everyone today.<br>No clock. Reach the target to stack it.</div>
     <button class="btn" onclick="Daily.play()">Play today's burger</button>
