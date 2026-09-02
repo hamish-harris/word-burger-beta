@@ -2539,7 +2539,7 @@ function renderSlowHome(){
   SlowCook.refresh();
   const s=Store.get();
   const done = s.slowToday && s.slowToday.day===SlowCook.day;
-  const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
+  const dateLbl = new Date().toLocaleDateString(undefined,{weekday:'long', month:'short', day:'numeric'});
   const streaks = `
     <div class="streaks">
       <div class="s"><div class="n">🔥 ${s.slowStreak||0}</div><div class="l">streak</div></div>
@@ -2549,10 +2549,13 @@ function renderSlowHome(){
     </div>`;
 
   $('slowDailyCard').innerHTML = done ? `
-    <div class="meta">Daily Burger #${SlowCook.day+1} · ${dateLbl} · you scored ${s.slowToday.score}</div>
+    <div class="eyebrow">${dateLbl}</div>
+    <h2>Today's burger is stacked</h2>
+    <div class="meta">Burger #${SlowCook.day+1} · you scored ${s.slowToday.score}</div>
     <button class="btn" onclick="SlowCook.showResult()">See result and share</button>
     ${streaks}` : `
-    <div class="meta">Daily Burger #${SlowCook.day+1} · ${dateLbl}</div>
+    <div class="eyebrow">${dateLbl}</div>
+    <h2>Daily Burger #${SlowCook.day+1}</h2>
     <button class="btn" onclick="SlowCook.play()">Order up</button>
     ${streaks}`;
 
